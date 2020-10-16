@@ -1,8 +1,8 @@
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <sys/stat.h>
 #include "common.h"
-#include <iostream>
 
 bool file_exists(char* const & fn) {
     struct stat tmp;
@@ -54,8 +54,8 @@ void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_
     }
 }
 
-void parse_sample_times(char* const & fn, unordered_map<string,int> const & name2num, vector<vector<double>> & sample_times) {
-    ifstream file(fn); string line; string tmp;
+void parse_sample_times(char* const & fn, unordered_map<string,int> const & name2num, vector<vector<double>> & sample_times, unsigned int & num_sample_times) {
+    ifstream file(fn); string line; string tmp; num_sample_times = 0;
     while(getline(file,line)) {
         // check for empty line and set up stringstream
         if(line.size() == 0 || line[0] == '#' || line[0] == '\n') {
@@ -77,6 +77,6 @@ void parse_sample_times(char* const & fn, unordered_map<string,int> const & name
         }
 
         // parse t and add to sample_times
-        getline(is, tmp, '\n'); sample_times[u].push_back(stof(tmp));
+        getline(is, tmp, '\n'); sample_times[u].push_back(stof(tmp)); ++num_sample_times;
     }
 }

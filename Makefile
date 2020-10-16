@@ -7,7 +7,7 @@ RELEASEFLAGS?=$(CXXFLAGS) -O3
 DEBUGFLAGS?=$(CXXFLAGS) -O0 -g
 
 # relevant constants
-GLOBAL_DEPS=main.cpp common.cpp common.h
+GLOBAL_DEPS=main.cpp common.cpp common.h coalescent.cpp coalescent.h
 EXE_PREFIX=coatran
 CONSTANT=constant
 CONSTANT_EXE=$(EXE_PREFIX)_$(CONSTANT)
