@@ -63,20 +63,21 @@ int main(int argc, char** argv) {
     vector<vector<int>> infected;
     parse_transmissions(argv[1], num2name, name2num, seeds, infection_time, infected);
     const unsigned int NUM_PEOPLE = num2name.size();
+    const unsigned int NUM_SEEDS = seeds.size();
 
     // parse sample times
     vector<vector<double>> sample_times(NUM_PEOPLE, vector<double>());
     parse_sample_times(argv[2], name2num, sample_times);
 
     // sample coalescent phylogenies
-    for(const int & seed : seeds) {
-        string phylo;
+    vector<string> phylos(NUM_SEEDS, string());
+    for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
         #ifdef EXPGROWTH // exponential effective population size
             coalescent_expgrowth(EFF_POP_GROWTH,
         #else // constant effective population size
             coalescent_constant(EFF_POP_SIZE,
         #endif
-        seed, infection_time, infected, phylo);
+        seeds[i], infection_time, infected, phylos[i]);
     }
     return 0;
 }
