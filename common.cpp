@@ -27,10 +27,13 @@ void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_
         int u; getline(is, tmp, '\t');
         if(tmp == "None") {
             u = -1;
-        } else if(name2num.find(tmp) == name2num.end()) {
-            cout << MALFORMED_TRANSMISSIONS << endl; exit(1);
         } else {
-            u = name2num[tmp];
+            auto itr = name2num.find(tmp);
+            if(itr == name2num.end()) {
+                cout << MALFORMED_TRANSMISSIONS << endl; exit(1);
+            } else {
+                u = itr->second;
+            }
         }
 
         // parse v
