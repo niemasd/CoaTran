@@ -48,6 +48,13 @@ int main(int argc, char** argv) {
         cerr << "File not found: " << argv[2] << endl; exit(1);
     }
 
+    // parse parameter(s)
+    #ifdef EXPGROWTH // exponential effective population size
+        const double EFF_POP_GROWTH = atof(argv[3]);
+    #else // constant effective population size
+        const double EFF_POP_SIZE = atof(argv[3]);
+    #endif
+
     // parse transmission network
     vector<string> num2name;
     unordered_map<string,int> name2num;
@@ -61,12 +68,15 @@ int main(int argc, char** argv) {
     vector<vector<double>> sample_times(NUM_PEOPLE, vector<double>());
     parse_sample_times(argv[2], name2num, sample_times);
 
-    // sample coalescent phylogeny; tree_pointers[u] = <parent, left_child, right_child> of node u
-    /*vector<tuple<int,int,int>> tree_pointers(NUM_NODES, make_tuple(-1,-1,-1));
-    #ifdef EXPGROWTH // exponential effective population size
-        coalescent_expgrowth(atof(argv[3]), tree_pointers);
-    #else // constant effective population size
-        coalescent_constant(atof(argv[3]), tree_pointers);
-    #endif*/
+    // sample coalescent phylogenies
+    for(const int & seed : seeds) {
+        string phylo;
+        #ifdef EXPGROWTH // exponential effective population size
+            coalescent_expgrowth(EFF_POP_GROWTH,
+        #else // constant effective population size
+            coalescent_constant(EFF_POP_SIZE,
+        #endif
+        seed, infection_time, infected, phylo);
+    }
     return 0;
 }
