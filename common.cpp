@@ -9,7 +9,7 @@ bool file_exists(char* const & fn) {
     return (stat(fn, &tmp) == 0);
 }
 
-void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_map<string,int> & name2num, vector<int> & seeds, vector<pair<int,double>> & infected_by, vector<vector<int>> & infected) {
+void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_map<string,int> & name2num, vector<int> & seeds, vector<double> & infection_time, vector<vector<int>> & infected) {
     ifstream file(fn); string line; string tmp;
     while(getline(file,line)) {
         // check for empty line and set up stringstream
@@ -45,7 +45,7 @@ void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_
         getline(is, tmp, '\n'); double t = stof(tmp);
 
         // add transmission
-        infected_by.push_back(make_pair(u,t));
+        infection_time.push_back(t);
         if(u == -1) {
             seeds.push_back(v);
         } else {
@@ -54,8 +54,8 @@ void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_
     }
 }
 
-void parse_sample_times(char* const & fn, unordered_map<string,int> const & name2num, vector<vector<double>> & sample_times, unsigned int & num_sample_times) {
-    ifstream file(fn); string line; string tmp; num_sample_times = 0;
+void parse_sample_times(char* const & fn, unordered_map<string,int> const & name2num, vector<vector<double>> & sample_times) {
+    ifstream file(fn); string line; string tmp;
     while(getline(file,line)) {
         // check for empty line and set up stringstream
         if(line.size() == 0 || line[0] == '#' || line[0] == '\n') {
@@ -77,6 +77,6 @@ void parse_sample_times(char* const & fn, unordered_map<string,int> const & name
         }
 
         // parse t and add to sample_times
-        getline(is, tmp, '\n'); sample_times[u].push_back(stof(tmp)); ++num_sample_times;
+        getline(is, tmp, '\n'); sample_times[u].push_back(stof(tmp));
     }
 }

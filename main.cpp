@@ -52,24 +52,21 @@ int main(int argc, char** argv) {
     vector<string> num2name;
     unordered_map<string,int> name2num;
     vector<int> seeds;
-    vector<pair<int,double>> infected_by;
+    vector<double> infection_time;
     vector<vector<int>> infected;
-    parse_transmissions(argv[1], num2name, name2num, seeds, infected_by, infected);
+    parse_transmissions(argv[1], num2name, name2num, seeds, infection_time, infected);
     const unsigned int NUM_PEOPLE = num2name.size();
 
     // parse sample times
     vector<vector<double>> sample_times(NUM_PEOPLE, vector<double>());
-    unsigned int tmp_uint;
-    parse_sample_times(argv[2], name2num, sample_times, tmp_uint);
-    const unsigned int NUM_LEAVES = tmp_uint; // number of leaves in phylogeny
-    const unsigned int NUM_NODES = 2 * NUM_LEAVES - 1;
+    parse_sample_times(argv[2], name2num, sample_times);
 
     // sample coalescent phylogeny; tree_pointers[u] = <parent, left_child, right_child> of node u
-    vector<tuple<int,int,int>> tree_pointers(NUM_NODES, make_tuple(-1,-1,-1));
+    /*vector<tuple<int,int,int>> tree_pointers(NUM_NODES, make_tuple(-1,-1,-1));
     #ifdef EXPGROWTH // exponential effective population size
         coalescent_expgrowth(atof(argv[3]), tree_pointers);
     #else // constant effective population size
         coalescent_constant(atof(argv[3]), tree_pointers);
-    #endif
+    #endif*/
     return 0;
 }
