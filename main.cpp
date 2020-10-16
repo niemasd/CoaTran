@@ -69,15 +69,16 @@ int main(int argc, char** argv) {
     vector<vector<double>> sample_times(NUM_PEOPLE, vector<double>());
     parse_sample_times(argv[2], name2num, sample_times);
 
-    // sample coalescent phylogenies
-    vector<string> phylos(NUM_SEEDS, string());
+    // sample coalescent phylogenies; phylos[i] is a vector of <parent,left,right,time> nodes for seed i
+    vector<vector<tuple<int,int,int,double>>> phylos(NUM_SEEDS, vector<tuple<int,int,int,double>>());
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
+        coalescent(
         #ifdef EXPGROWTH // exponential effective population size
-            coalescent_expgrowth(EFF_POP_GROWTH,
+            EFF_POP_GROWTH
         #else // constant effective population size
-            coalescent_constant(EFF_POP_SIZE,
+            EFF_POP_SIZE
         #endif
-        seeds[i], infection_time, infected, phylos[i]);
+        , seeds[i], infection_time, infected, sample_times, phylos[i]);
     }
     return 0;
 }
