@@ -1,3 +1,9 @@
+# CoaTran executables
+coatran_constant
+coatran_constant_debug
+coatran_expgrowth
+coatran_expgrowth_debug
+
 # Prerequisites
 *.d
 
