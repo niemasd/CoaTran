@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
     // output Newick strings for each phylogeny
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
         int const & root = roots[i]; vector<tuple<int,int,double,int>> const & phylo = phylos[i];
-        string s; newick(root, phylo, num2name, s); s += to_string(get<2>(phylo[root])); s += ';';
+        string s; newick(root, phylo, num2name, s); s += ':'; s += to_string(get<2>(phylo[root])); s += ';';
         cout << s << endl;
     }
     return 0;
