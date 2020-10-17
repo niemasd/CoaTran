@@ -1,9 +1,15 @@
 #ifndef COMMON_H
 #define COMMON_H
+#include <chrono>
+#include <random>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 using namespace std;
+
+// random number generation
+extern const int RNG_SEED;
+extern default_random_engine RNG;
 
 /**
  * Check if a file exists
@@ -11,6 +17,22 @@ using namespace std;
  * @return `true` if `fn` exists, otherwise `false`
  */
 bool file_exists(char* const & fn);
+
+/**
+ * Pop a random element from an unsorted vector
+ * @param vec The unsorted vector from which to pop
+ * @return A random element, after removing it from the vector (order will change)
+ */
+template<class T>
+T vector_pop(vector<T> & vec) {
+    const int & last_ind = vec.size() - 1;
+    uniform_int_distribution<int> uniform_rv(0, last_ind);
+    const int & ind_to_remove = uniform_rv(RNG);
+    T tmp = vec[ind_to_remove];
+    vec[ind_to_remove] = vec[last_ind];
+    vec.pop_back();
+    return tmp;
+}
 
 /**
  * Load the transmission network from file

@@ -1,7 +1,9 @@
 #include <algorithm>
 #include <iostream>
+#include <random>
 #include <tuple>
 #include "coalescent.h"
+#include "common.h"
 
 int coalescent(
 #ifdef EXPGROWTH // exponential effective population size
@@ -45,8 +47,54 @@ int coalescent(
     // sort leaves in decreasing order of time
     sort(leaves.begin(), leaves.end(), [&phylo](int const & lhs, int const & rhs){return get<3>(phylo[lhs]) > get<3>(phylo[rhs]);});
 
+    // precompute values that will be repeatedly used
+    #ifdef EXPGROWTH // exponential effective population size
+        // TODO ADD EXPGROWTH
+    #else // constant effective population size
+        const double TWO_TIMES_C = 2 * eff_pop_size;
+    #endif
+
     // coalesce leaves
-    //double curr_time = get<3>(phylo[leaves[1]]); // start at time of 2nd-latest leaf
-    cout << "NEED TO IMPLEMENT THE ACTUAL COALESCENCE!" << endl; exit(1);
-    return leaves[0];
+    vector<int> lineages = {leaves[0]}; double curr_time;
+    for(unsigned int i = 1; i < leaves.size(); ++i) {
+        lineages.push_back(leaves[i]); // add the next leaf
+        curr_time = get<3>(phylo[leaves[i]]); // move time to next leaf
+        // coalesce as much as possible before time of next next leaf
+        while(lineages.size() != 1) {
+            // sample the time of the next coalescent event
+            const int & N = lineages.size();
+            #ifdef EXPGROWTH // exponential effective population size
+                exponential_distribution<double> rv(N); // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
+            #else // constant effective population size
+                exponential_distribution<double> rv(N*(N-1)/TWO_TIMES_C);
+            #endif
+            double const & coal_time = curr_time - rv(RNG);
+
+            // if next coalescent event is earlier than next leaf, failed to coalesce
+            double cutoff_time;
+            if(i == leaves.size()-1) {
+                cutoff_time = infection_time[seed];
+            } else {
+                cutoff_time = get<3>(phylo[leaves[i+1]]);
+            }
+            if(coal_time < cutoff_time) {
+                break;
+            }
+
+            // coalesce 2 random lineages
+            const int & parent = phylo.size();
+            const int & lin1 = vector_pop(lineages); get<0>(phylo[lin1]) = parent;
+            const int & lin2 = vector_pop(lineages); get<0>(phylo[lin2]) = parent;
+            phylo.push_back(make_tuple(-1,lin1,lin2,coal_time));
+            lineages.push_back(parent); curr_time = coal_time;
+        }
+    }
+
+    // coalesce remaining lineages, constrained to coalesce between curr_time and infection_time[seed]
+    while(lineages.size() != 1) {
+        // TODO sample delta under truncated distribution
+        // TODO coalesce 2 random lineages
+        cerr << "NEED TO HANDLE TRUNCATED DISTRIBUTION COALESCENCE" << endl; exit(1);
+    }
+    return lineages[0];
 }
