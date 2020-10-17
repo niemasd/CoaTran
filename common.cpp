@@ -83,3 +83,34 @@ void parse_sample_times(char* const & fn, unordered_map<string,int> const & name
         getline(is, tmp, '\n'); sample_times[u].push_back(stof(tmp));
     }
 }
+
+void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, vector<string> const & num2name, string & s) {
+    // store node values for convenience
+    tuple<int,int,double,int> const & node = phylo[root];
+    int const & left = get<0>(node);
+    int const & right = get<1>(node);
+    double const & time = get<2>(node);
+    int const & person = get<3>(node);
+    if(time < 0) {
+        cerr << "Encountered negative time" << endl; exit(1);
+    }
+
+    // if leaf, output NODE|PERSON|TIME
+    if(left == -1 && right == -1) {
+        if(person == -1) {
+            cerr << "Encountered a leaf not associated with a person" << endl; exit(1);
+        }
+        s += to_string(root); s += "|"; s += num2name[person]; s += "|"; s += to_string(time);
+    }
+
+    // if internal node, don't output any label
+    else {
+        s += "(";
+        newick(left, phylo, num2name, s); // left subtree
+        s += ":"; s += to_string(get<2>(phylo[left]) - time); // left branch length
+        s += ",";
+        newick(right, phylo, num2name, s); // right subtree
+        s += ":"; s += to_string(get<2>(phylo[right]) - time); // right branch length
+        s += ")";
+    }
+}

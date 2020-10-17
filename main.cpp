@@ -69,16 +69,24 @@ int main(int argc, char** argv) {
     vector<vector<double>> sample_times(NUM_PEOPLE, vector<double>());
     parse_sample_times(argv[2], name2num, sample_times);
 
-    // sample coalescent phylogenies; phylos[i] is a vector of <parent,left,right,time> nodes for seed i
-    vector<vector<tuple<int,int,int,double>>> phylos(NUM_SEEDS, vector<tuple<int,int,int,double>>());
+    // sample coalescent phylogenies; phylos[i] is a vector of <left,right,time,person> nodes for seed i
+    vector<vector<tuple<int,int,double,int>>> phylos(NUM_SEEDS, vector<tuple<int,int,double,int>>());
+    vector<int> roots(NUM_SEEDS, -1); // roots[i] is the root index of phylos[i]
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
-        coalescent(
+        roots[i] = coalescent(
         #ifdef EXPGROWTH // exponential effective population size
             EFF_POP_GROWTH
         #else // constant effective population size
             EFF_POP_SIZE
         #endif
         , seeds[i], infection_time, infected, sample_times, phylos[i]);
+    }
+
+    // output Newick strings for each phylogeny
+    for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
+        int const & root = roots[i]; vector<tuple<int,int,double,int>> const & phylo = phylos[i];
+        string s; newick(root, phylo, num2name, s); s += to_string(get<2>(phylo[root])); s += ';';
+        cout << s << endl;
     }
     return 0;
 }

@@ -11,7 +11,7 @@ using namespace std;
  * @param infection_time Each person's infection time
  * @param infected Keep track of the people person x infected
  * @param sample_times Keep track of each person's sample time(s)
- * @param phylo The (initially empty) vector to fill with the Newick tree as <parent,left,right,time> tuples
+ * @param phylo The (initially empty) vector to fill with the Newick tree as <left,right,time,person> tuples
  * @return The node (as an index of phylo) corresponding to the root of the (sub)tree
  */
 int coalescent(
@@ -20,5 +20,5 @@ int coalescent(
 #else // constant effective population size
     double const & eff_pop_size
 #endif
-, int const & seed, vector<double> const & infection_time, vector<vector<int>> const & infected, vector<vector<double>> const & sample_times, vector<tuple<int,int,int,double>> & phylo);
+, int const & seed, vector<double> const & infection_time, vector<vector<int>> const & infected, vector<vector<double>> const & sample_times, vector<tuple<int,int,double,int>> & phylo);
 #endif
