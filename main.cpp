@@ -50,9 +50,9 @@ int main(int argc, char** argv) {
 
     // parse parameter(s)
     #ifdef EXPGROWTH // exponential effective population size
-        const double EFF_POP_GROWTH = atof(argv[3]);
+        double const EFF_POP_GROWTH = atof(argv[3]);
     #else // constant effective population size
-        const double EFF_POP_SIZE = atof(argv[3]);
+        double const EFF_POP_SIZE = atof(argv[3]);
     #endif
 
     // parse transmission network
