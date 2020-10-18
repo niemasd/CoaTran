@@ -1,15 +1,25 @@
 #include <fstream>
 #include <iostream>
+#include <math.h>
 #include <sstream>
 #include <sys/stat.h>
 #include "common.h"
 
 const int RNG_SEED = chrono::system_clock::now().time_since_epoch().count();
 default_random_engine RNG(RNG_SEED);
+uniform_real_distribution<double>  UNIFORM_0_1(0.0, 1.0);
 
 bool file_exists(char* const & fn) {
     struct stat tmp;
     return (stat(fn, &tmp) == 0);
+}
+
+double sample_expon(double const & rate) {
+    return (-log(1-UNIFORM_0_1(RNG)))/rate;
+}
+
+double sample_trunc_expon(double const & rate, double const & T) {
+    return (-log(1-(UNIFORM_0_1(RNG)*(1-exp((-rate)*T)))))/rate;
 }
 
 void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_map<string,int> & name2num, vector<int> & seeds, vector<double> & infection_time, vector<vector<int>> & infected) {

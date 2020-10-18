@@ -54,7 +54,7 @@ int coalescent(
     #endif
 
     // coalesce leaves
-    vector<int> lineages = {leaves[0]}; double curr_time;
+    vector<int> lineages = {leaves[0]}; double curr_time = -1;
     for(unsigned int i = 1; i < leaves.size(); ++i) {
         lineages.push_back(leaves[i]); // add the next leaf
         curr_time = get<2>(phylo[leaves[i]]); // move time to next leaf
@@ -62,12 +62,13 @@ int coalescent(
         while(lineages.size() != 1) {
             // sample the time of the next coalescent event
             const int & N = lineages.size();
+            double const & coal_time = curr_time - 
             #ifdef EXPGROWTH // exponential effective population size
-                exponential_distribution<double> rv(N); // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
+                sample_expon(N*0) // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
             #else // constant effective population size
-                exponential_distribution<double> rv(N*(N-1)/TWO_TIMES_C);
+                sample_expon(N*(N-1)/TWO_TIMES_C)
             #endif
-            double const & coal_time = curr_time - rv(RNG);
+            ;
 
             // if next coalescent event is earlier than next leaf, failed to coalesce
             double cutoff_time;
@@ -91,9 +92,26 @@ int coalescent(
 
     // coalesce remaining lineages, constrained to coalesce between curr_time and infection_time[seed]
     while(lineages.size() != 1) {
-        // TODO sample delta under truncated distribution
-        // TODO coalesce 2 random lineages
-        cerr << "NEED TO HANDLE TRUNCATED DISTRIBUTION COALESCENCE" << endl; exit(1);
+        if(curr_time < 0) {
+            cerr << "Negative curr_time" << endl; exit(1);
+        }
+
+        // sample delta under truncated distribution
+        const int & N = lineages.size();
+        double const & coal_time = curr_time - 
+        #ifdef EXPGROWTH // exponential effective population size
+            sample_expon(N*00) // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
+        #else // constant effective population size
+            sample_trunc_expon(N*(N-1)/TWO_TIMES_C, curr_time-infection_time[seed])
+        #endif
+        ;
+
+        // coalesce 2 random lineages
+        const int & parent = phylo.size();
+        const int & lin1 = vector_pop(lineages);
+        const int & lin2 = vector_pop(lineages);
+        phylo.push_back(make_tuple(lin1,lin2,coal_time,-1));
+        lineages.push_back(parent); curr_time = coal_time;
     }
     return lineages[0];
 }

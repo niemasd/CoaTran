@@ -10,6 +10,7 @@ using namespace std;
 // random number generation
 extern const int RNG_SEED;
 extern default_random_engine RNG;
+extern uniform_real_distribution<double> UNIFORM_0_1;
 
 /**
  * Check if a file exists
@@ -17,6 +18,21 @@ extern default_random_engine RNG;
  * @return `true` if `fn` exists, otherwise `false`
  */
 bool file_exists(char* const & fn);
+
+/**
+ * Sample from an exponential distribution
+ * @param rate The rate parameter (lambda) of the exponential distribution
+ * @return A random sample from the user-defined exponential distribution
+ */
+double sample_expon(double const & rate);
+
+/**
+ * Sample from a truncated exponential distribution
+ * @param rate The rate parameter (lambda) of the truncated exponential distribution
+ * @param T The point at which to truncate the exponential distribution, i.e., the maximum sample value
+ * @return A random sample from the user-defined truncated exponential distribution
+ */
+double sample_trunc_expon(double const & rate, double const & T);
 
 /**
  * Load the transmission network from file
