@@ -22,6 +22,13 @@ double sample_trunc_expon(double const & rate, double const & T) {
     return (-log(1-(UNIFORM_0_1(RNG)*(1-exp((-rate)*T)))))/rate;
 }
 
+double sample_coal_time_expgrowth(double const & t0, int const & N, double const & tI, double const & N0, double const & r) {
+    //cout << "NIEMA: " << 2*r*N0*log(1-UNIFORM_0_1(RNG)) << endl; // negative number
+    //cout << "NIEMA: " << r*(t0-tI) << endl;
+    //TODO THIS IS INCORRECT, FIX!!!!!!!!!
+    return log((2*r*N0*log(1-UNIFORM_0_1(RNG)))/(N*(N-1)*exp(r*(t0-tI))))/r;
+}
+
 void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_map<string,int> & name2num, vector<int> & seeds, vector<double> & infection_time, vector<vector<int>> & infected) {
     ifstream file(fn); string line; string tmp;
     while(getline(file,line)) {

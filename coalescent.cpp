@@ -7,11 +7,13 @@
 
 int coalescent(
 #ifdef EXPGROWTH // exponential effective population size
-    double const & eff_pop_growth
+    double const & init_eff_pop_size, double const & eff_pop_growth
 #else // constant effective population size
     double const & eff_pop_size
 #endif
 , int const & seed, vector<double> const & infection_time, vector<vector<int>> const & infected, vector<vector<double>> const & sample_times, vector<tuple<int,int,double,int>> & phylo) {
+    // store things that are used multiple times
+    double const & SEED_INF_TIME = infection_time[seed];
 
     // add node(s) for sample time(s) of the seed
     vector<int> leaves; // vector of phylo indices of leaves of this segment
@@ -23,7 +25,7 @@ int coalescent(
     for(int const & child : infected[seed]) {
         const int & tmp = coalescent(
         #ifdef EXPGROWTH // exponential effective population size
-            eff_pop_growth
+            init_eff_pop_size, eff_pop_growth
         #else // constant effective population size
             eff_pop_size
         #endif
@@ -64,7 +66,7 @@ int coalescent(
             const int & N = lineages.size();
             double const & coal_time = curr_time - 
             #ifdef EXPGROWTH // exponential effective population size
-                sample_expon(N*0) // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
+                sample_coal_time_expgrowth(curr_time, N, SEED_INF_TIME, init_eff_pop_size, eff_pop_growth)
             #else // constant effective population size
                 sample_expon(N*(N-1)/TWO_TIMES_C)
             #endif
@@ -73,7 +75,7 @@ int coalescent(
             // if next coalescent event is earlier than next leaf, failed to coalesce
             double cutoff_time;
             if(i == leaves.size()-1) {
-                cutoff_time = infection_time[seed];
+                cutoff_time = SEED_INF_TIME;
             } else {
                 cutoff_time = get<2>(phylo[leaves[i+1]]);
             }
@@ -102,7 +104,7 @@ int coalescent(
         #ifdef EXPGROWTH // exponential effective population size
             sample_expon(N*00) // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
         #else // constant effective population size
-            sample_trunc_expon(N*(N-1)/TWO_TIMES_C, curr_time-infection_time[seed])
+            sample_trunc_expon(N*(N-1)/TWO_TIMES_C, curr_time-SEED_INF_TIME)
         #endif
         ;
 

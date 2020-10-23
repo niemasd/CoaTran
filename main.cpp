@@ -21,7 +21,7 @@ const string OPEN_MESSAGE = DESCRIPTION + string(" (constant effective populatio
 // number of user args
 #ifndef NUM_USER_ARGS
 #ifdef EXPGROWTH // exponential effective population size
-#define NUM_USER_ARGS 4
+#define NUM_USER_ARGS 5
 #else // constant effective population size
 #define NUM_USER_ARGS 4
 #endif
@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
     if(argc != NUM_USER_ARGS || strcmp(argv[1],"-h") == 0 || strcmp(argv[1],"--help") == 0) {
         cerr << OPEN_MESSAGE << endl << "USAGE: " << argv[0] << " <trans_network> <sample_times>" <<
         #ifdef EXPGROWTH // exponential effective population size
-            " <eff_pop_growth>"
+            " <init_eff_pop_size> <eff_pop_growth>"
         #else // constant effective population size
             " <eff_pop_size>"
         #endif
@@ -50,7 +50,8 @@ int main(int argc, char** argv) {
 
     // parse parameter(s)
     #ifdef EXPGROWTH // exponential effective population size
-        double const EFF_POP_GROWTH = atof(argv[3]);
+        double const INIT_EFF_POP_SIZE = atof(argv[3]);
+        double const EFF_POP_GROWTH = atof(argv[4]);
     #else // constant effective population size
         double const EFF_POP_SIZE = atof(argv[3]);
     #endif
@@ -75,7 +76,7 @@ int main(int argc, char** argv) {
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
         roots[i] = coalescent(
         #ifdef EXPGROWTH // exponential effective population size
-            EFF_POP_GROWTH
+            INIT_EFF_POP_SIZE, EFF_POP_GROWTH
         #else // constant effective population size
             EFF_POP_SIZE
         #endif

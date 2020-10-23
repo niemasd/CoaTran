@@ -35,6 +35,17 @@ double sample_expon(double const & rate);
 double sample_trunc_expon(double const & rate, double const & T);
 
 /**
+ * Sample from the probability distribution of coalescent time with exponential population growth
+ * @param t0 Current time
+ * @param N Number of lineages at current time t0
+ * @param tI Time of infection
+ * @param N0 Initial effective population size at time of infection tI
+ * @param r Effective population growth rate
+ * @return A random sample of a coalescent time under exponential effective population growth
+ */
+double sample_coal_time_expgrowth(double const & t0, int const & N, double const & tI, double const & N0, double const & r);
+
+/**
  * Load the transmission network from file
  * @param fn The filename of the transmission network (TSV)
  * @param num2name A mapping from integer label to transmission network name; need to populate

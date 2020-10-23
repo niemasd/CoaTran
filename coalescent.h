@@ -16,7 +16,7 @@ using namespace std;
  */
 int coalescent(
 #ifdef EXPGROWTH // exponential effective population size
-    double const & eff_pop_growth
+    double const & init_eff_pop_size, double const & eff_pop_growth
 #else // constant effective population size
     double const & eff_pop_size
 #endif
