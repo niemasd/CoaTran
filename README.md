@@ -1,2 +1,13 @@
 # CoaTran
-CoaTran: Coalescent tree simulation along a transmission network
+TODO DESCRIPTION
+
+## Installation
+TODO COMPILE INFO
+
+## Usage
+TODO USAGE INFO
+
+MENTION RNG SEED VIA `COATRAN_RNG_SEED` ENVIRONMENT VARIABLE
+
+# Citing CoaTran
+TODO CITATION INFO
