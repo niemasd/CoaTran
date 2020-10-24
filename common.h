@@ -8,7 +8,7 @@
 using namespace std;
 
 // random number generation
-extern const int RNG_SEED;
+extern int RNG_SEED;
 extern default_random_engine RNG;
 extern uniform_real_distribution<double> UNIFORM_0_1;
 

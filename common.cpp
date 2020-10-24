@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include "common.h"
 
-const int RNG_SEED = chrono::system_clock::now().time_since_epoch().count();
+int RNG_SEED = chrono::system_clock::now().time_since_epoch().count();
 default_random_engine RNG(RNG_SEED);
 uniform_real_distribution<double>  UNIFORM_0_1(0.0, 1.0);
 

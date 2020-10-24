@@ -1,8 +1,14 @@
+#include <cstdlib>
 #include <iostream>
 #include <string.h>
 #include "coalescent.h"
 #include "common.h"
 using namespace std;
+
+// RNG seed environment variable
+#ifndef RNG_SEED_ENV_VAR
+#define RNG_SEED_ENV_VAR "COATRAN_RNG_SEED"
+#endif
 
 // description
 #ifndef DESCRIPTION
@@ -38,6 +44,15 @@ int main(int argc, char** argv) {
             " <eff_pop_size>"
         #endif
         << endl; exit(1);
+    }
+
+    // check if user provided a seed
+    const char* const rng_seed_env = getenv(RNG_SEED_ENV_VAR);
+    if(rng_seed_env != nullptr) {
+        int tmp = atoi(rng_seed_env);
+        if(tmp != 0) {
+            RNG_SEED = tmp; RNG = default_random_engine(RNG_SEED);
+        }
     }
 
     // check if files exist
