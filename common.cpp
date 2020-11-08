@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <math.h>
 #include <sstream>
 #include <sys/stat.h>
@@ -15,10 +16,22 @@ bool file_exists(char* const & fn) {
 }
 
 double sample_expon(double const & rate) {
+    // if rate is 0, return infinity
+    if(rate < ZERO_TOLERANCE) {
+        return numeric_limits<double>::infinity();
+    }
+
+    // otherwise, sample from exponential r.v.
     return (-log(1-UNIFORM_0_1(RNG)))/rate;
 }
 
 double sample_trunc_expon(double const & rate, double const & T) {
+    // if rate is 0, return truncation point
+    if(rate < ZERO_TOLERANCE) {
+        return T;
+    }
+
+    // otherwise, sample from truncated exponential r.v.
     return (-log(1-(UNIFORM_0_1(RNG)*(1-exp((-rate)*T)))))/rate;
 }
 
@@ -118,6 +131,14 @@ void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, v
             cerr << "Encountered a leaf not associated with a person" << endl; exit(1);
         }
         s += to_string(root); s += "|"; s += num2name[person]; s += "|"; s += to_string(time);
+    }
+
+    // if dummy transmission event node, output unifurcation
+    else if(left == right) {
+        s += "(";
+        newick(left, phylo, num2name, s); // child subtree
+        s += ":"; s += to_string(get<2>(phylo[left]) - time); // child branch length
+        s += ")";
     }
 
     // if internal node, don't output any label

@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <random>
 #include <tuple>
@@ -40,11 +41,6 @@ int coalescent(
         return -1;
     }
 
-    // if 1 leaf, just return that leaf
-    if(leaves.size() == 1) {
-        return leaves[0];
-    }
-
     // sort leaves in decreasing order of time
     sort(leaves.begin(), leaves.end(), [&phylo](int const & lhs, int const & rhs){return get<2>(phylo[lhs]) > get<2>(phylo[rhs]);});
 
@@ -58,8 +54,15 @@ int coalescent(
     // coalesce leaves
     vector<int> lineages = {leaves[0]}; double curr_time = -1;
     for(unsigned int i = 1; i < leaves.size(); ++i) {
+        // prepare for coalescing
         lineages.push_back(leaves[i]); // add the next leaf
         curr_time = get<2>(phylo[leaves[i]]); // move time to next leaf
+
+        // if we've added the last lineage, just break and do truncated coalescence
+        if(i == leaves.size()-1) {
+            break;
+        }
+
         // coalesce as much as possible before time of next next leaf
         while(lineages.size() != 1) {
             // sample the time of the next coalescent event
@@ -73,14 +76,9 @@ int coalescent(
             ;
 
             // if next coalescent event is earlier than next leaf, failed to coalesce
-            double cutoff_time;
-            if(i == leaves.size()-1) {
-                cutoff_time = SEED_INF_TIME;
-            } else {
-                cutoff_time = get<2>(phylo[leaves[i+1]]);
-            }
+            double cutoff_time = get<2>(phylo[leaves[i+1]]);
             if(coal_time < cutoff_time) {
-                break;
+                curr_time = cutoff_time; break;
             }
 
             // coalesce 2 random lineages
@@ -94,19 +92,28 @@ int coalescent(
 
     // coalesce remaining lineages, constrained to coalesce between curr_time and infection_time[seed]
     while(lineages.size() != 1) {
+        // check for validity
         if(curr_time < 0) {
             cerr << "Negative curr_time" << endl; exit(1);
         }
+        double coal_time;
 
-        // sample delta under truncated distribution
-        const int & N = lineages.size();
-        double const & coal_time = curr_time - 
-        #ifdef EXPGROWTH // exponential effective population size
-            sample_expon(N*00) // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
-        #else // constant effective population size
-            sample_trunc_expon(N*(N-1)/TWO_TIMES_C, curr_time-SEED_INF_TIME)
-        #endif
-        ;
+        // check if we've hit the seed infection time
+        if(abs(curr_time-SEED_INF_TIME) < ZERO_TOLERANCE) {
+            coal_time = SEED_INF_TIME;
+        }
+
+        // if not, sample delta under truncated distribution
+        else {
+            const int & N = lineages.size();
+            coal_time = curr_time - 
+            #ifdef EXPGROWTH // exponential effective population size
+                sample_expon(N*00) // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
+            #else // constant effective population size
+                sample_trunc_expon(N*(N-1)/TWO_TIMES_C, curr_time-SEED_INF_TIME)
+            #endif
+            ;
+        }
 
         // coalesce 2 random lineages
         const int & parent = phylo.size();
@@ -115,5 +122,10 @@ int coalescent(
         phylo.push_back(make_tuple(lin1,lin2,coal_time,-1));
         lineages.push_back(parent); curr_time = coal_time;
     }
-    return lineages[0];
+
+    // add dummy root node at time of transmission
+    const int & parent = phylo.size();
+    const int & child = lineages[0];
+    phylo.push_back(make_tuple(child,child,SEED_INF_TIME,-1));
+    return parent;
 }

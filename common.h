@@ -7,6 +7,11 @@
 #include <vector>
 using namespace std;
 
+// define 0 tolerance
+#ifndef ZERO_TOLERANCE
+#define ZERO_TOLERANCE 0.00000000001
+#endif
+
 // random number generation
 extern int RNG_SEED;
 extern default_random_engine RNG;
