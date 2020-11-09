@@ -17,18 +17,28 @@ using namespace std;
 
 // opening message
 #ifndef OPEN_MESSAGE
-#ifdef EXPGROWTH // exponential effective population size
-const string OPEN_MESSAGE = DESCRIPTION + string(" (exponential effective population size)");
-#else // constant effective population size
-const string OPEN_MESSAGE = DESCRIPTION + string(" (constant effective population size)");
+const string OPEN_MESSAGE = DESCRIPTION + string(
+#if defined EXPGROWTH   // exponential effective population size growth
+" (exponential effective population size)"
+#elif defined TRANSTREE // latest possible coalescence (time of transmission)
+" (time of transmission)"
+#elif defined INFTIME   // earliest possible coalescence (time of infection)
+" (time of infection)"
+#else                   // constant effective population size
+" (constant effective population size)"
 #endif
+);
 #endif
 
 // number of user args
 #ifndef NUM_USER_ARGS
-#ifdef EXPGROWTH // exponential effective population size
+#if defined EXPGROWTH   // exponential effective population size growth
 #define NUM_USER_ARGS 5
-#else // constant effective population size
+#elif defined TRANSTREE // latest possible coalescence (time of transmission)
+#define NUM_USER_ARGS 3
+#elif defined INFTIME   // earliest possible coalescence (time of infection)
+#define NUM_USER_ARGS 3
+#else                   // constant effective population size
 #define NUM_USER_ARGS 4
 #endif
 #endif
@@ -37,11 +47,15 @@ const string OPEN_MESSAGE = DESCRIPTION + string(" (constant effective populatio
 int main(int argc, char** argv) {
     // check usage
     if(argc != NUM_USER_ARGS || strcmp(argv[1],"-h") == 0 || strcmp(argv[1],"--help") == 0) {
-        cerr << OPEN_MESSAGE << endl << "USAGE: " << argv[0] << " <trans_network> <sample_times>" <<
-        #ifdef EXPGROWTH // exponential effective population size
-            " <init_eff_pop_size> <eff_pop_growth>"
-        #else // constant effective population size
-            " <eff_pop_size>"
+        cerr << OPEN_MESSAGE << endl << "USAGE: " << argv[0] << " <trans_network> <sample_times>"
+        #if defined EXPGROWTH   // exponential effective population size growth
+            << " <init_eff_pop_size> <eff_pop_growth>"
+        #elif defined TRANSTREE // latest possible coalescence (time of transmission)
+            // no parameters needed
+        #elif defined INFTIME   // earliest possible coalescence (time of infection)
+            // no parameters needed
+        #else                   // constant effective population size
+            << " <eff_pop_size>"
         #endif
         << endl; exit(1);
     }
@@ -64,11 +78,15 @@ int main(int argc, char** argv) {
     }
 
     // parse parameter(s)
-    #ifdef EXPGROWTH // exponential effective population size
-        double const INIT_EFF_POP_SIZE = atof(argv[3]);
-        double const EFF_POP_GROWTH = atof(argv[4]);
-    #else // constant effective population size
-        double const EFF_POP_SIZE = atof(argv[3]);
+    #if defined EXPGROWTH   // exponential effective population size growth
+        double const & INIT_EFF_POP_SIZE = atof(argv[3]);
+        double const & EFF_POP_GROWTH = atof(argv[4]);
+    #elif defined TRANSTREE // latest possible coalescence (time of transmission)
+        // no parameters needed
+    #elif defined INFTIME   // earliest possible coalescence (time of infection)
+        // no parameters needed
+    #else                   // constant effective population size
+        double const & EFF_POP_SIZE = atof(argv[3]);
     #endif
 
     // parse transmission network
@@ -90,12 +108,16 @@ int main(int argc, char** argv) {
     vector<int> roots(NUM_SEEDS, -1); // roots[i] is the root index of phylos[i]
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
         roots[i] = coalescent(
-        #ifdef EXPGROWTH // exponential effective population size
-            INIT_EFF_POP_SIZE, EFF_POP_GROWTH
-        #else // constant effective population size
-            EFF_POP_SIZE
+        #if defined EXPGROWTH   // exponential effective population size growth
+            INIT_EFF_POP_SIZE, EFF_POP_GROWTH,
+        #elif defined TRANSTREE // latest possible coalescence (time of transmission)
+            // no parameters needed
+        #elif defined INFTIME   // earliest possible coalescence (time of infection)
+            // no parameters needed
+        #else                   // constant effective population size
+            EFF_POP_SIZE,
         #endif
-        , seeds[i], infection_time, infected, sample_times, phylos[i]);
+        seeds[i], infection_time, infected, sample_times, phylos[i]);
     }
 
     // output Newick strings for each phylogeny

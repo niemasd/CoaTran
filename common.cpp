@@ -1,14 +1,15 @@
 #include <fstream>
 #include <iostream>
-#include <limits>
 #include <math.h>
 #include <sstream>
 #include <sys/stat.h>
 #include "common.h"
 
+// initialize extern variables from common.h
 int RNG_SEED = chrono::system_clock::now().time_since_epoch().count();
 default_random_engine RNG(RNG_SEED);
-uniform_real_distribution<double>  UNIFORM_0_1(0.0, 1.0);
+uniform_real_distribution<double> UNIFORM_0_1(0.0, 1.0);
+const double DOUBLE_INFINITY = numeric_limits<double>::infinity();
 
 bool file_exists(char* const & fn) {
     struct stat tmp;
@@ -18,7 +19,7 @@ bool file_exists(char* const & fn) {
 double sample_expon(double const & rate) {
     // if rate is 0, return infinity
     if(rate < ZERO_TOLERANCE_RATE) {
-        return numeric_limits<double>::infinity();
+        return DOUBLE_INFINITY;
     }
 
     // otherwise, sample from exponential r.v.

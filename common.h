@@ -1,6 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
 #include <chrono>
+#include <limits>
 #include <random>
 #include <unordered_map>
 #include <utility>
@@ -21,6 +22,9 @@ using namespace std;
 extern int RNG_SEED;
 extern default_random_engine RNG;
 extern uniform_real_distribution<double> UNIFORM_0_1;
+
+// infinity
+extern const double DOUBLE_INFINITY;
 
 /**
  * Check if a file exists

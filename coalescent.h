@@ -15,10 +15,14 @@ using namespace std;
  * @return The node (as an index of phylo) corresponding to the root of the (sub)tree
  */
 int coalescent(
-#ifdef EXPGROWTH // exponential effective population size
-    double const & init_eff_pop_size, double const & eff_pop_growth
-#else // constant effective population size
-    double const & eff_pop_size
+#if defined EXPGROWTH   // exponential effective population size growth
+    double const & init_eff_pop_size, double const & eff_pop_growth,
+#elif defined TRANSTREE // latest possible coalescence (time of transmission)
+    // no parameters needed
+#elif defined INFTIME   // earliest possible coalescence (time of infection)
+    // no parameters needed
+#else                   // constant effective population size
+    double const & eff_pop_size,
 #endif
-, int const & seed, vector<double> const & infection_time, vector<vector<int>> const & infected, vector<vector<double>> const & sample_times, vector<tuple<int,int,double,int>> & phylo);
+int const & seed, vector<double> const & infection_time, vector<vector<int>> const & infected, vector<vector<double>> const & sample_times, vector<tuple<int,int,double,int>> & phylo);
 #endif

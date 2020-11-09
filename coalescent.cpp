@@ -7,12 +7,16 @@
 #include "common.h"
 
 int coalescent(
-#ifdef EXPGROWTH // exponential effective population size
-    double const & init_eff_pop_size, double const & eff_pop_growth
-#else // constant effective population size
-    double const & eff_pop_size
+#if defined EXPGROWTH   // exponential effective population size growth
+    double const & init_eff_pop_size, double const & eff_pop_growth,
+#elif defined TRANSTREE // latest possible coalescence (time of transmission)
+    // no parameters needed
+#elif defined INFTIME   // earliest possible coalescence (time of infection)
+    // no parameters needed
+#else                   // constant effective population size
+    double const & eff_pop_size,
 #endif
-, int const & seed, vector<double> const & infection_time, vector<vector<int>> const & infected, vector<vector<double>> const & sample_times, vector<tuple<int,int,double,int>> & phylo) {
+int const & seed, vector<double> const & infection_time, vector<vector<int>> const & infected, vector<vector<double>> const & sample_times, vector<tuple<int,int,double,int>> & phylo) {
     // store things that are used multiple times
     double const & SEED_INF_TIME = infection_time[seed];
 
@@ -25,12 +29,16 @@ int coalescent(
     // first call this function recursively on children
     for(int const & child : infected[seed]) {
         const int & tmp = coalescent(
-        #ifdef EXPGROWTH // exponential effective population size
-            init_eff_pop_size, eff_pop_growth
-        #else // constant effective population size
-            eff_pop_size
+        #if defined EXPGROWTH   // exponential effective population size growth
+            init_eff_pop_size, eff_pop_growth,
+        #elif defined TRANSTREE // latest possible coalescence (time of transmission)
+            // no parameters needed
+        #elif defined INFTIME   // earliest possible coalescence (time of infection)
+            // no parameters needed
+        #else                   // constant effective population size
+            eff_pop_size,
         #endif
-        , child, infection_time, infected, sample_times, phylo);
+        child, infection_time, infected, sample_times, phylo);
         if(tmp != -1) {
             leaves.push_back(tmp);
         }
@@ -45,9 +53,13 @@ int coalescent(
     sort(leaves.begin(), leaves.end(), [&phylo](int const & lhs, int const & rhs){return get<2>(phylo[lhs]) > get<2>(phylo[rhs]);});
 
     // precompute values that will be repeatedly used
-    #ifdef EXPGROWTH // exponential effective population size
+    #if defined EXPGROWTH   // exponential effective population size growth
         // TODO ADD EXPGROWTH
-    #else // constant effective population size
+    #elif defined TRANSTREE // latest possible coalescence (time of transmission)
+        // no precomputed values needed
+    #elif defined INFTIME   // earliest possible coalescence (time of infection)
+        // no precomputed values needed
+    #else                   // constant effective population size
         const double TWO_TIMES_C = 2 * eff_pop_size;
     #endif
 
@@ -66,17 +78,20 @@ int coalescent(
         // coalesce as much as possible before time of next next leaf
         while(lineages.size() != 1) {
             // sample the time of the next coalescent event
-            const int & N = lineages.size();
-            double const & coal_time = curr_time - 
-            #ifdef EXPGROWTH // exponential effective population size
-                sample_coal_time_expgrowth(curr_time, N, SEED_INF_TIME, init_eff_pop_size, eff_pop_growth)
-            #else // constant effective population size
-                sample_expon(N*(N-1)/TWO_TIMES_C)
+            double const & coal_time = curr_time
+            #if defined EXPGROWTH   // exponential effective population size growth
+                - sample_coal_time_expgrowth(curr_time, lineages.size(), SEED_INF_TIME, init_eff_pop_size, eff_pop_growth)
+            #elif defined TRANSTREE // latest possible coalescence (time of transmission)
+                // do nothing
+            #elif defined INFTIME   // earliest possible coalescence (time of infection)
+                - DOUBLE_INFINITY
+            #else                   // constant effective population size
+                - sample_expon(lineages.size()*(lineages.size()-1)/TWO_TIMES_C)
             #endif
             ;
 
             // if next coalescent event is earlier than next leaf, failed to coalesce
-            double cutoff_time = get<2>(phylo[leaves[i+1]]);
+            double const & cutoff_time = get<2>(phylo[leaves[i+1]]);
             if(coal_time < cutoff_time) {
                 curr_time = cutoff_time; break;
             }
@@ -105,12 +120,15 @@ int coalescent(
 
         // if not, sample delta under truncated distribution
         else {
-            const int & N = lineages.size();
-            coal_time = curr_time - 
-            #ifdef EXPGROWTH // exponential effective population size
-                sample_expon(N*00) // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
-            #else // constant effective population size
-                sample_trunc_expon(N*(N-1)/TWO_TIMES_C, curr_time-SEED_INF_TIME)
+            coal_time =
+            #if defined EXPGROWTH   // exponential effective population size growth
+                curr_time - sample_expon(0) // TODO REPLACE WITH CORRECT ONE FOR EXP GROWTH
+            #elif defined TRANSTREE // latest possible coalescence (time of transmission)
+                curr_time
+            #elif defined INFTIME   // earliest possible coalescence (time of infection)
+                SEED_INF_TIME
+            #else                   // constant effective population size
+                curr_time - sample_trunc_expon(lineages.size()*(lineages.size()-1)/TWO_TIMES_C, curr_time-SEED_INF_TIME)
             #endif
             ;
         }
