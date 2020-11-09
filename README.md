@@ -28,6 +28,12 @@ When compiled, CoaTran will produce different executables depending on the model
 * **`<trans_network>`:** The transmission network, in the [FAVITES format](https://github.com/niemasd/FAVITES/wiki/File-Formats#transmission-network-file-format)
 * **`<sample_times>`:** The sample times, in the [FAVITES format](https://github.com/niemasd/FAVITES/wiki/File-Formats#sample-time-file-format)
 
+In all modes, you can specify a constant random number generator seed (e.g. for reproducibility) by setting the `COATRAN_RNG_SEED` environment variable:
+
+```bash
+export COATRAN_RNG_SEED=42
+```
+
 ## Constant Effective Population Size (`coatran_constant`)
 You can use `coatran_constant` to simulate phylogenies under coalescence with constant effective population size:
 
@@ -62,8 +68,6 @@ You can use `coatran_inftime` to simulate phylogenies such that coalescence happ
 ```bash
 coatran_inftime <trans_network> <sample_times>
 ```
-
-MENTION RNG SEED VIA `COATRAN_RNG_SEED` ENVIRONMENT VARIABLE
 
 # Citing CoaTran
 TODO CITATION INFO
