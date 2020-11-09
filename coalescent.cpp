@@ -99,7 +99,7 @@ int coalescent(
         double coal_time;
 
         // check if we've hit the seed infection time
-        if(abs(curr_time-SEED_INF_TIME) < ZERO_TOLERANCE) {
+        if(abs(curr_time-SEED_INF_TIME) < ZERO_TOLERANCE_TIME) {
             coal_time = SEED_INF_TIME;
         }
 

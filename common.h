@@ -7,9 +7,14 @@
 #include <vector>
 using namespace std;
 
-// define 0 tolerance
-#ifndef ZERO_TOLERANCE
-#define ZERO_TOLERANCE 0.00000000001
+// define 0 tolerance for Poisson rates
+#ifndef ZERO_TOLERANCE_RATE
+#define ZERO_TOLERANCE_RATE 0.00000000001
+#endif
+
+// define 0 tolerance for times
+#ifndef ZERO_TOLERANCE_TIME
+#define ZERO_TOLERANCE_TIME 0.0000001
 #endif
 
 // random number generation

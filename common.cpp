@@ -17,7 +17,7 @@ bool file_exists(char* const & fn) {
 
 double sample_expon(double const & rate) {
     // if rate is 0, return infinity
-    if(rate < ZERO_TOLERANCE) {
+    if(rate < ZERO_TOLERANCE_RATE) {
         return numeric_limits<double>::infinity();
     }
 
@@ -27,7 +27,7 @@ double sample_expon(double const & rate) {
 
 double sample_trunc_expon(double const & rate, double const & T) {
     // if rate is 0, return truncation point
-    if(rate < ZERO_TOLERANCE) {
+    if(rate < ZERO_TOLERANCE_RATE) {
         return T;
     }
 
