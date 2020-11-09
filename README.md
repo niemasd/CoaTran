@@ -1,5 +1,5 @@
-# CoaTran
-CoaTran: Coalescent tree simulation along a transmission network. Given a transmission network and sample times, CoaTran will simulate a coalescent phylogeny constrained by the transmission network. CoaTran is similar in functionality to the [VirusTreeSimulator](https://github.com/PangeaHIV/VirusTreeSimulator) component of [PANGEA.HIV.sim](https://github.com/olli0601/PANGEA.HIV.sim), but CoaTran is consistently ~100x faster.
+# CoaTran: Coalescent tree simulation along a transmission network
+CoaTran is a tool that, given a transmission network and sample times, will simulate a coalescent phylogeny constrained by the transmission network. CoaTran is similar in functionality to the [VirusTreeSimulator](https://github.com/PangeaHIV/VirusTreeSimulator) component of [PANGEA.HIV.sim](https://github.com/olli0601/PANGEA.HIV.sim), but CoaTran is consistently ~100x faster.
 
 # Installation
 To compile CoaTran, simply download the latest release or clone this repository, and then compile using `make`:
