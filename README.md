@@ -46,7 +46,7 @@ coatran_constant <trans_network> <sample_times> <eff_pop_size>
 ## ~Exponential Effective Population Size Growth~
 **THIS MODE DOES NOT WORK YET!!!**
 
-You can use `coatran_expgrowth` to simulate phylogenies under coalescence with exponential effective population size growth from the time of infection:
+~You can use `coatran_expgrowth` to simulate phylogenies under coalescence with exponential effective population size growth from the time of infection:~
 
 ```bash
 coatran_expgrowth <trans_network> <sample_times> <init_eff_pop_size> <eff_pop_growth>
