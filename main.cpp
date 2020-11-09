@@ -19,7 +19,7 @@ using namespace std;
 #ifndef OPEN_MESSAGE
 const string OPEN_MESSAGE = DESCRIPTION + string(
 #if defined EXPGROWTH   // exponential effective population size growth
-" (exponential effective population size)"
+" (exponential effective population size growth)"
 #elif defined TRANSTREE // latest possible coalescence (time of transmission)
 " (time of transmission)"
 #elif defined INFTIME   // earliest possible coalescence (time of infection)
