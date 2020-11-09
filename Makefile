@@ -4,7 +4,7 @@ CXXFLAGS?=-Wall -pedantic -std=c++11
 
 # flag specifications for release and debug
 RELEASEFLAGS?=$(CXXFLAGS) -O3
-DEBUGFLAGS?=$(CXXFLAGS) -O0 -g
+DEBUGFLAGS?=$(CXXFLAGS) -O0 -g -pg
 
 # relevant constants
 GLOBAL_DEPS=main.cpp common.cpp common.h coalescent.cpp coalescent.h
