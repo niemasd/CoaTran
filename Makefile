@@ -1,41 +1,72 @@
 # use g++ compiler
 CXX=g++
+CXXFLAGS?=-Wall -pedantic -std=c++11
 
 # flag specifications for release and debug
-CXXFLAGS?=-Wall -pedantic -std=c++11
 RELEASEFLAGS?=$(CXXFLAGS) -O3
 DEBUGFLAGS?=$(CXXFLAGS) -O0 -g
 
 # relevant constants
 GLOBAL_DEPS=main.cpp common.cpp common.h coalescent.cpp coalescent.h
 EXE_PREFIX=coatran
+
+## constant effective population size
 CONSTANT=constant
 CONSTANT_EXE=$(EXE_PREFIX)_$(CONSTANT)
 CONSTANT_DEBUG=$(CONSTANT)_debug
 CONSTANT_DEBUG_EXE=$(EXE_PREFIX)_$(CONSTANT_DEBUG)
+
+## exponential effective population size growth
 EXPGROWTH=expgrowth
 EXPGROWTH_EXE=$(EXE_PREFIX)_$(EXPGROWTH)
 EXPGROWTH_DEBUG=$(EXPGROWTH)_debug
 EXPGROWTH_DEBUG_EXE=$(EXE_PREFIX)_$(EXPGROWTH_DEBUG)
-EXES=$(CONSTANT_EXE) $(CONSTANT_DEBUG_EXE) $(EXPGROWTH_EXE) $(EXPGROWTH_DEBUG_EXE)
+
+## latest possible coalescence (time of transmission)
+TRANSTREE=transtree
+TRANSTREE_EXE=$(EXE_PREFIX)_$(TRANSTREE)
+TRANSTREE_DEBUG=$(TRANSTREE)_debug
+TRANSTREE_DEBUG_EXE=$(EXE_PREFIX)_$(TRANSTREE_DEBUG)
+
+## earliest possible coalescence (time of infection)
+INFTIME=inftime
+INFTIME_EXE=$(EXE_PREFIX)_$(INFTIME)
+INFTIME_DEBUG=$(INFTIME)_debug
+INFTIME_DEBUG_EXE=$(EXE_PREFIX)_$(INFTIME_DEBUG)
 
 # compile all executables
-all: $(CONSTANT_EXE) $(EXPGROWTH_EXE)
-debug: $(CONSTANT_DEBUG_EXE) $(EXPGROWTH_DEBUG_EXE)
+RELEASE_EXES=$(CONSTANT_EXE) $(EXPGROWTH_EXE) $(TRANSTREE_EXE) $(INFTIME_EXE)
+DEBUG_EXES=$(CONSTANT_DEBUG_EXE) $(EXPGROWTH_DEBUG_EXE) $(TRANSTREE_DEBUG_EXE) $(INFTIME_DEBUG_EXE)
+all: $(RELEASE_EXES)
+debug: $(DEBUG_EXES)
 
-# constant population size
+## constant effective population size
 $(CONSTANT_EXE): $(GLOBAL_DEPS)
 	$(CXX) $(RELEASEFLAGS) -o $(CONSTANT_EXE) $(GLOBAL_DEPS)
 $(CONSTANT_DEBUG_EXE): $(GLOBAL_DEPS)
 	$(CXX) $(DEBUGFLAGS) -o $(CONSTANT_DEBUG_EXE) $(GLOBAL_DEPS)
 
-# exponential population size growth
+## exponential effective population size growth
 EXPGROWTH_FLAG=-DEXPGROWTH
 $(EXPGROWTH_EXE): $(GLOBAL_DEPS)
 	$(CXX) $(RELEASEFLAGS) $(EXPGROWTH_FLAG) -o $(EXPGROWTH_EXE) $(GLOBAL_DEPS)
 $(EXPGROWTH_DEBUG_EXE): $(GLOBAL_DEPS)
 	$(CXX) $(DEBUGFLAGS) $(EXPGROWTH_FLAG) -o $(EXPGROWTH_DEBUG_EXE) $(GLOBAL_DEPS)
 
+## latest possible coalescence (time of transmission)
+TRANSTREE_FLAG=-DTRANSTREE
+$(TRANSTREE_EXE): $(GLOBAL_DEPS)
+	$(CXX) $(RELEASEFLAGS) $(TRANSTREE_FLAG) -o $(TRANSTREE_EXE) $(GLOBAL_DEPS)
+$(TRANSTREE_DEBUG_EXE): $(GLOBAL_DEPS)
+	$(CXX) $(DEBUGFLAGS) $(TRANSTREE_FLAG) -o $(TRANSTREE_DEBUG_EXE) $(GLOBAL_DEPS)
+
+## earliest possible coalescence (time of infection)
+INFTIME_FLAG=-DINFTIME
+$(INFTIME_EXE): $(GLOBAL_DEPS)
+	$(CXX) $(RELEASEFLAGS) $(INFTIME_FLAG) -o $(INFTIME_EXE) $(GLOBAL_DEPS)
+$(INFTIME_DEBUG_EXE): $(GLOBAL_DEPS)
+	$(CXX) $(DEBUGFLAGS) $(INFTIME_FLAG) -o $(INFTIME_DEBUG_EXE) $(GLOBAL_DEPS)
+
 # clean things up
 clean:
-	$(RM) $(EXES) *.o
+	$(RM) $(RELEASE_EXES) $(DEBUG_EXES) *.o

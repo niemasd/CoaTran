@@ -3,6 +3,10 @@ coatran_constant
 coatran_constant_debug
 coatran_expgrowth
 coatran_expgrowth_debug
+coatran_inftime
+coatran_inftime_debug
+coatran_transtree
+coatran_transtree_debug
 
 # Output Trees
 *.nwk
