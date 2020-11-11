@@ -34,6 +34,16 @@ In all modes, you can specify a constant random number generator seed (e.g. for 
 export COATRAN_RNG_SEED=42
 ```
 
+The Newick trees output by CoaTran have unifurcations (i.e., an internal node with a single child) at the times of infection, which may be useful information. However, if you want to suppress unifurcations (i.e., merge the branches above and below the unifurcating node), you can do so easily with tools like [TreeSwift](https://github.com/niemasd/TreeSwift) or [DendroPy](https://dendropy.org/):
+
+```python3
+from treeswift import read_tree_newick
+coatran_output_file = "my_tree.nwk"
+tree = read_tree_newick(coatran_output_file)
+tree.suppress_unifurcations()
+print(tree.newick())
+```
+
 ## Constant Effective Population Size (`coatran_constant`)
 You can use `coatran_constant` to simulate phylogenies under coalescence with constant effective population size:
 
