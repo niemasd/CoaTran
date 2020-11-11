@@ -50,14 +50,14 @@ double sample_trunc_expon(double const & rate, double const & T);
 
 /**
  * Sample from the probability distribution of coalescent time with exponential population growth
- * @param t0 Current time
- * @param N Number of lineages at current time t0
- * @param tI Time of infection
- * @param N0 Initial effective population size at time of infection tI
- * @param r Effective population growth rate
+ * @param tau Current time
+ * @param N Number of lineages at current time tau
+ * @param tauI Time of infection
+ * @param r Growth rate
+ * @param neg_2_r_S0 -2 * growth rate (r) * initial effective population size (S0)
  * @return A random sample of a coalescent time under exponential effective population growth
  */
-double sample_coal_time_expgrowth(double const & t0, int const & N, double const & tI, double const & N0, double const & r);
+double sample_coal_time_expgrowth(double const & tau, int const & N, double const & tauI, double const & r, double const & neg_2_r_S0);
 
 /**
  * Load the transmission network from file

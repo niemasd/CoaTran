@@ -8,7 +8,7 @@
 // initialize extern variables from common.h
 int RNG_SEED = chrono::system_clock::now().time_since_epoch().count();
 default_random_engine RNG(RNG_SEED);
-uniform_real_distribution<double> UNIFORM_0_1(0.0, 1.0);
+uniform_real_distribution<double> UNIFORM_0_1(0., 1.);
 const double DOUBLE_INFINITY = numeric_limits<double>::infinity();
 
 bool file_exists(char* const & fn) {
@@ -23,7 +23,7 @@ double sample_expon(double const & rate) {
     }
 
     // otherwise, sample from exponential r.v.
-    return (-log(1-UNIFORM_0_1(RNG)))/rate;
+    return (-log(1.-UNIFORM_0_1(RNG)))/rate;
 }
 
 double sample_trunc_expon(double const & rate, double const & T) {
@@ -33,14 +33,11 @@ double sample_trunc_expon(double const & rate, double const & T) {
     }
 
     // otherwise, sample from truncated exponential r.v.
-    return (-log(1-(UNIFORM_0_1(RNG)*(1-exp((-rate)*T)))))/rate;
+    return (-log(1.-(UNIFORM_0_1(RNG)*(1.-exp((-rate)*T)))))/rate;
 }
 
-double sample_coal_time_expgrowth(double const & t0, int const & N, double const & tI, double const & N0, double const & r) {
-    //cout << "NIEMA: " << 2*r*N0*log(1-UNIFORM_0_1(RNG)) << endl; // negative number
-    //cout << "NIEMA: " << r*(t0-tI) << endl;
-    //TODO THIS IS INCORRECT, FIX!!!!!!!!!
-    return log((2*r*N0*log(1-UNIFORM_0_1(RNG)))/(N*(N-1)*exp(r*(t0-tI))))/r;
+double sample_coal_time_expgrowth(double const & tau, int const & N, double const & tauI, double const & r, double const & neg_2_r_S0) {
+    return ((log((neg_2_r_S0*log(1.-UNIFORM_0_1(RNG)))/(N*(N-1)))+1.)/r)+tau-tauI;
 }
 
 void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_map<string,int> & name2num, vector<int> & seeds, vector<double> & infection_time, vector<vector<int>> & infected) {

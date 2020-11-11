@@ -54,7 +54,7 @@ int const & seed, vector<double> const & infection_time, vector<vector<int>> con
 
     // precompute values that will be repeatedly used
     #if defined EXPGROWTH   // exponential effective population size growth
-        // TODO ADD EXPGROWTH
+        const double NEG_2_R_S0 = -2. * eff_pop_growth * init_eff_pop_size;
     #elif defined TRANSTREE // latest possible coalescence (time of transmission)
         // no precomputed values needed
     #elif defined INFTIME   // earliest possible coalescence (time of infection)
@@ -80,7 +80,7 @@ int const & seed, vector<double> const & infection_time, vector<vector<int>> con
             // sample the time of the next coalescent event
             double const & coal_time = curr_time
             #if defined EXPGROWTH   // exponential effective population size growth
-                - sample_coal_time_expgrowth(curr_time, lineages.size(), SEED_INF_TIME, init_eff_pop_size, eff_pop_growth)
+                - sample_coal_time_expgrowth(curr_time, lineages.size(), SEED_INF_TIME, eff_pop_growth, NEG_2_R_S0)
             #elif defined TRANSTREE // latest possible coalescence (time of transmission)
                 // do nothing
             #elif defined INFTIME   // earliest possible coalescence (time of infection)

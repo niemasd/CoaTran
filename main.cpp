@@ -5,6 +5,11 @@
 #include "common.h"
 using namespace std;
 
+// CoaTran version
+#ifndef COATRAN_VERSION
+#define COATRAN_VERSION "0.0.1"
+#endif
+
 // RNG seed environment variable
 #ifndef RNG_SEED_ENV_VAR
 #define RNG_SEED_ENV_VAR "COATRAN_RNG_SEED"
@@ -12,7 +17,7 @@ using namespace std;
 
 // description
 #ifndef DESCRIPTION
-#define DESCRIPTION string("CoaTran: Coalescent tree simulation along a transmission network")
+#define DESCRIPTION string("CoaTran v") + string(COATRAN_VERSION)
 #endif
 
 // opening message
