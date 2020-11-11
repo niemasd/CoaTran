@@ -1,5 +1,5 @@
-# CoaTran
-TODO DESCRIPTION
+# CoaTran: Coalescent tree simulation along a transmission network
+CoaTran is a tool that, given a transmission network and sample times, will simulate a coalescent phylogeny constrained by the transmission network. CoaTran is similar in functionality to the [VirusTreeSimulator](https://github.com/PangeaHIV/VirusTreeSimulator) component of [PANGEA.HIV.sim](https://github.com/olli0601/PANGEA.HIV.sim), but CoaTran is consistently ~100x faster.
 
 # Installation
 To compile CoaTran, simply download the latest release or clone this repository, and then compile using `make`:
@@ -34,6 +34,16 @@ In all modes, you can specify a constant random number generator seed (e.g. for 
 export COATRAN_RNG_SEED=42
 ```
 
+The Newick trees output by CoaTran have unifurcations (i.e., an internal node with a single child) at the times of infection, which may be useful information. However, if you want to suppress unifurcations (i.e., merge the branches above and below the unifurcating node), you can do so easily with tools like [TreeSwift](https://github.com/niemasd/TreeSwift) or [DendroPy](https://dendropy.org/):
+
+```python3
+from treeswift import read_tree_newick
+coatran_output_file = "my_tree.nwk"
+tree = read_tree_newick(coatran_output_file)
+tree.suppress_unifurcations()
+print(tree.newick())
+```
+
 ## Constant Effective Population Size (`coatran_constant`)
 You can use `coatran_constant` to simulate phylogenies under coalescence with constant effective population size:
 
@@ -43,10 +53,10 @@ coatran_constant <trans_network> <sample_times> <eff_pop_size>
 
 * **`<eff_pop_size>`:** The effective population size, which remains constant
 
-## Exponential Effective Population Size Growth
+## ~Exponential Effective Population Size Growth~
 **THIS MODE DOES NOT WORK YET!!!**
 
-You can use `coatran_expgrowth` to simulate phylogenies under coalescence with exponential effective population size growth from the time of infection:
+~You can use `coatran_expgrowth` to simulate phylogenies under coalescence with exponential effective population size growth from the time of infection:~
 
 ```bash
 coatran_expgrowth <trans_network> <sample_times> <init_eff_pop_size> <eff_pop_growth>
