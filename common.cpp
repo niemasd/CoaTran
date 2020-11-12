@@ -23,7 +23,8 @@ double sample_expon(double const & rate) {
     }
 
     // otherwise, sample from exponential r.v.
-    return (-log(1.-UNIFORM_0_1(RNG)))/rate;
+    const double & P = UNIFORM_0_1(RNG);
+    return (-log(1.-P))/rate;
 }
 
 double sample_trunc_expon(double const & rate, double const & T) {
@@ -33,11 +34,42 @@ double sample_trunc_expon(double const & rate, double const & T) {
     }
 
     // otherwise, sample from truncated exponential r.v.
-    return (-log(1.-(UNIFORM_0_1(RNG)*(1.-exp((-rate)*T)))))/rate;
+    const double & P = UNIFORM_0_1(RNG);
+    return (-log(1.-(P*(1.-exp((-rate)*T)))))/rate;
 }
 
-double sample_coal_time_expgrowth(double const & tau, int const & N, double const & tauI, double const & r, double const & neg_2_r_S0) {
-    return ((log((neg_2_r_S0*log(1.-UNIFORM_0_1(RNG)))/(N*(N-1)))+1.)/r)+tau-tauI;
+double sample_coal_time_expgrowth(double const & tau, int const & N, double const & tauI, double const & S0, double const & r) {
+    // if initial effective population size is 0, return 0
+    if(S0 < ZERO_TOLERANCE_S0) {
+        return 0;
+    }
+
+    // if growth rate is 0, return what I do with constant effective population size
+    if(r < ZERO_TOLERANCE_RATE) {
+        return sample_trunc_expon(N*(N-1)/(2*S0), tau-tauI);
+    }
+
+    // otherwise, sample from exponential population growth distribution
+    const double & P = UNIFORM_0_1(RNG);
+    cout << ((log((-2.*r*S0*log(1.-P))/(N*(N-1)))+1.)/r)+tau-tauI << endl;
+    return ((log((-2.*r*S0*log(1.-P))/(N*(N-1)))+1.)/r)+tau-tauI;
+}
+
+double sample_coal_time_expgrowth_trunc(double const & tau, int const & N, double const & tauI, double const & S0, double const & r) {
+    // if initial effective population size is 0, return 0
+    if(S0 < ZERO_TOLERANCE_S0) {
+        return 0;
+    }
+
+    // if growth rate is 0, return what I do with constant effective population size
+    if(r < ZERO_TOLERANCE_RATE) {
+        return sample_trunc_expon(N*(N-1)/(2*S0), tau-tauI);
+    }
+
+    // otherwise, sample from truncated exponential population growth distribution
+    double const & T = tau - tauI; // truncation time
+    const double & P = UNIFORM_0_1(RNG);
+    return ((log((-2.*r*S0*log(1.-(P*(1.-exp((N*(N-1)*exp(r*(T+tauI-tau)-1.))/(-2.*r*S0))))))/(N*(N-1)))+1)/r)+tau-tauI;
 }
 
 void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_map<string,int> & name2num, vector<int> & seeds, vector<double> & infection_time, vector<vector<int>> & infected) {

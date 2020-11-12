@@ -18,6 +18,11 @@ using namespace std;
 #define ZERO_TOLERANCE_TIME 0.0000001
 #endif
 
+// define 0 tolerance for effective population sizes (S0)
+#ifndef ZERO_TOLERANCE_S0
+#define ZERO_TOLERANCE_S0 0.00000000001
+#endif
+
 // random number generation
 extern int RNG_SEED;
 extern default_random_engine RNG;
@@ -53,11 +58,23 @@ double sample_trunc_expon(double const & rate, double const & T);
  * @param tau Current time
  * @param N Number of lineages at current time tau
  * @param tauI Time of infection
+ * @param S0 Initial effective population size
  * @param r Growth rate
- * @param neg_2_r_S0 -2 * growth rate (r) * initial effective population size (S0)
  * @return A random sample of a coalescent time under exponential effective population growth
  */
-double sample_coal_time_expgrowth(double const & tau, int const & N, double const & tauI, double const & r, double const & neg_2_r_S0);
+double sample_coal_time_expgrowth(double const & tau, int const & N, double const & tauI, double const & S0, double const & r);
+
+/**
+ * Sample from the probability distribution of truncated coalescent time with exponential population growth
+ * Note that T (the truncation time) = tau - tauI
+ * @param tau Current time
+ * @param N Number of lineages at current time tau
+ * @param tauI Time of infection
+ * @param S0 Initial effective population size
+ * @param r Growth rate
+ * @return A random sample of a truncated coalescent time under exponential effective population growth
+ */
+double sample_coal_time_expgrowth_trunc(double const & tau, int const & N, double const & tauI, double const & S0, double const & r);
 
 /**
  * Load the transmission network from file
