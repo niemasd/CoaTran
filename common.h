@@ -23,6 +23,15 @@ using namespace std;
 #define ZERO_TOLERANCE_S0 0.00000000001
 #endif
 
+// global variables related to coalescent
+extern vector<double> infection_time;           // Each person's infection time
+extern unordered_map<string,int> name2num;      // Map names to integers
+extern vector<string> num2name;                 // Map integers to names
+extern vector<tuple<int,int,double,int>> phylo; // Newick tree as <left,right,time,person> tuples
+extern vector<int> seeds;                       // Seed individuals (as integers)
+extern vector<vector<int>> infected;            // The individuals infected by a given individual
+extern vector<vector<double>> sample_times;     // Keep track of each person's sample time(s)
+
 // random number generation
 extern int RNG_SEED;
 extern default_random_engine RNG;
@@ -79,31 +88,23 @@ double sample_coal_time_expgrowth_trunc(double const & tau, int const & N, doubl
 /**
  * Load the transmission network from file
  * @param fn The filename of the transmission network (TSV)
- * @param num2name A mapping from integer label to transmission network name; need to populate
- * @param name2num A mapping from transmission network names to integer labels; need to populate
- * @param seeds The seed nodes; need to populate
- * @param infection_time Each person's infection time; need to populate
- * @param infected Keep track of the people person x infected; need to populate
  */
-void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_map<string,int> & name2num, vector<int> & seeds, vector<double> & infection_time, vector<vector<int>> & infected);
+void parse_transmissions(char* const & fn);
 
 /**
  * Load the sample times from file
  * @param fn The filename of the sample times (TSV)
- * @param name2num An already-filled mapping of names to numbers
- * @param sample_times Keep track of the sample times of person x; need to populate
- * @param num_sample_times The total number of sample times (sum of sample_times values)
  */
-void parse_sample_times(char* const & fn, unordered_map<string,int> const & name2num, vector<vector<double>> & sample_times);
+void parse_sample_times(char* const & fn);
 
 /**
  * Build a Newick string from a phylo vector of <left,right,time,person> tuples
  * @param root The root of the subtree
  * @param phylo The phylo vector
- * @param num2name A mapping from integer label to transmission network name
+ * @param s The string to build
  * @return A Newick string of the tree represented by phylo
  */
-void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, vector<string> const & num2name, string & s);
+void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, string & s);
 
 /**
  * Pop a random element from an unsorted vector

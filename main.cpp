@@ -48,6 +48,27 @@ const string OPEN_MESSAGE = DESCRIPTION + string(
 #endif
 #endif
 
+// declare extern global vars from common.h
+vector<double> infection_time;
+unordered_map<string,int> name2num;
+vector<string> num2name;
+vector<tuple<int,int,double,int>> phylo;
+vector<int> seeds;
+vector<vector<int>> infected;
+vector<vector<double>> sample_times;
+
+// declare extern global vars from coalescent.h
+#if defined EXPGROWTH   // exponential effective population size growth
+double init_eff_pop_size;
+double eff_pop_growth;
+#elif defined TRANSTREE // latest possible coalescence (time of transmission)
+// no parameters needed
+#elif defined INFTIME   // earliest possible coalescence (time of infection)
+// no parameters needed
+#else                   // constant effective population size
+double eff_pop_size;
+#endif
+
 // main driver
 int main(int argc, char** argv) {
     // check usage
@@ -84,52 +105,37 @@ int main(int argc, char** argv) {
 
     // parse parameter(s)
     #if defined EXPGROWTH   // exponential effective population size growth
-        double const & INIT_EFF_POP_SIZE = atof(argv[3]);
-        double const & EFF_POP_GROWTH = atof(argv[4]);
+        init_eff_pop_size = atof(argv[3]);
+        eff_pop_growth = atof(argv[4]);
     #elif defined TRANSTREE // latest possible coalescence (time of transmission)
         // no parameters needed
     #elif defined INFTIME   // earliest possible coalescence (time of infection)
         // no parameters needed
     #else                   // constant effective population size
-        double const & EFF_POP_SIZE = atof(argv[3]);
+        eff_pop_size = atof(argv[3]);
     #endif
 
     // parse transmission network
-    vector<string> num2name;
-    unordered_map<string,int> name2num;
-    vector<int> seeds;
-    vector<double> infection_time;
-    vector<vector<int>> infected;
-    parse_transmissions(argv[1], num2name, name2num, seeds, infection_time, infected);
+    parse_transmissions(argv[1]);
     const unsigned int NUM_PEOPLE = num2name.size();
     const unsigned int NUM_SEEDS = seeds.size();
 
     // parse sample times
-    vector<vector<double>> sample_times(NUM_PEOPLE, vector<double>());
-    parse_sample_times(argv[2], name2num, sample_times);
+    sample_times = vector<vector<double>>(NUM_PEOPLE, vector<double>());
+    parse_sample_times(argv[2]);
 
     // sample coalescent phylogenies; phylos[i] is a vector of <left,right,time,person> nodes for seed i
     vector<vector<tuple<int,int,double,int>>> phylos(NUM_SEEDS, vector<tuple<int,int,double,int>>());
     vector<int> roots(NUM_SEEDS, -1); // roots[i] is the root index of phylos[i]
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
-        roots[i] = coalescent(
-        #if defined EXPGROWTH   // exponential effective population size growth
-            INIT_EFF_POP_SIZE, EFF_POP_GROWTH,
-        #elif defined TRANSTREE // latest possible coalescence (time of transmission)
-            // no parameters needed
-        #elif defined INFTIME   // earliest possible coalescence (time of infection)
-            // no parameters needed
-        #else                   // constant effective population size
-            EFF_POP_SIZE,
-        #endif
-        seeds[i], infection_time, infected, sample_times, phylos[i]);
+        roots[i] = coalescent(seeds[i], phylos[i]);
     }
 
     // output Newick strings for each phylogeny
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
         int const & root = roots[i]; vector<tuple<int,int,double,int>> const & phylo = phylos[i];
         if(!phylo.empty()) {
-            string s; newick(root, phylo, num2name, s); s += ':'; s += to_string(get<2>(phylo[root])); s += ';';
+            string s; newick(root, phylo, s); s += ':'; s += to_string(get<2>(phylo[root])); s += ';';
             cout << s << endl;
         }
     }

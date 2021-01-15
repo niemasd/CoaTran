@@ -72,7 +72,7 @@ double sample_coal_time_expgrowth_trunc(double const & tau, int const & N, doubl
     return ((log((-2.*r*S0*log(1.-(P*(1.-exp((N*(N-1)*exp(r*(T+tauI-tau)-1.))/(-2.*r*S0))))))/(N*(N-1)))+1)/r)+tau-tauI;
 }
 
-void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_map<string,int> & name2num, vector<int> & seeds, vector<double> & infection_time, vector<vector<int>> & infected) {
+void parse_transmissions(char* const & fn) {
     ifstream file(fn); string line; string tmp;
     while(getline(file,line)) {
         // check for empty line and set up stringstream
@@ -120,7 +120,7 @@ void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_
     }
 }
 
-void parse_sample_times(char* const & fn, unordered_map<string,int> const & name2num, vector<vector<double>> & sample_times) {
+void parse_sample_times(char* const & fn) {
     ifstream file(fn); string line; string tmp;
     while(getline(file,line)) {
         // check for empty line and set up stringstream
@@ -147,7 +147,7 @@ void parse_sample_times(char* const & fn, unordered_map<string,int> const & name
     }
 }
 
-void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, vector<string> const & num2name, string & s) {
+void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, string & s) {
     // store node values for convenience
     tuple<int,int,double,int> const & node = phylo[root];
     int const & left = get<0>(node);
@@ -169,7 +169,7 @@ void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, v
     // if dummy transmission event node, output unifurcation
     else if(left == right) {
         s += "(";
-        newick(left, phylo, num2name, s); // child subtree
+        newick(left, phylo, s); // child subtree
         s += ":"; s += to_string(get<2>(phylo[left]) - time); // child branch length
         s += ")";
     }
@@ -177,10 +177,10 @@ void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, v
     // if internal node, don't output any label
     else {
         s += "(";
-        newick(left, phylo, num2name, s); // left subtree
+        newick(left, phylo, s); // left subtree
         s += ":"; s += to_string(get<2>(phylo[left]) - time); // left branch length
         s += ",";
-        newick(right, phylo, num2name, s); // right subtree
+        newick(right, phylo, s); // right subtree
         s += ":"; s += to_string(get<2>(phylo[right]) - time); // right branch length
         s += ")";
     }

@@ -6,17 +6,7 @@
 #include "coalescent.h"
 #include "common.h"
 
-int coalescent(
-#if defined EXPGROWTH   // exponential effective population size growth
-    double const & init_eff_pop_size, double const & eff_pop_growth,
-#elif defined TRANSTREE // latest possible coalescence (time of transmission)
-    // no parameters needed
-#elif defined INFTIME   // earliest possible coalescence (time of infection)
-    // no parameters needed
-#else                   // constant effective population size
-    double const & eff_pop_size,
-#endif
-int const & seed, vector<double> const & infection_time, vector<vector<int>> const & infected, vector<vector<double>> const & sample_times, vector<tuple<int,int,double,int>> & phylo) {
+int coalescent(int const & seed, vector<tuple<int,int,double,int>> & phylo) {
     // store things that are used multiple times
     double const & SEED_INF_TIME = infection_time[seed];
 
@@ -28,17 +18,7 @@ int const & seed, vector<double> const & infection_time, vector<vector<int>> con
 
     // first call this function recursively on children
     for(int const & child : infected[seed]) {
-        const int & tmp = coalescent(
-        #if defined EXPGROWTH   // exponential effective population size growth
-            init_eff_pop_size, eff_pop_growth,
-        #elif defined TRANSTREE // latest possible coalescence (time of transmission)
-            // no parameters needed
-        #elif defined INFTIME   // earliest possible coalescence (time of infection)
-            // no parameters needed
-        #else                   // constant effective population size
-            eff_pop_size,
-        #endif
-        child, infection_time, infected, sample_times, phylo);
+        const int & tmp = coalescent(child, phylo);
         if(tmp != -1) {
             leaves.push_back(tmp);
         }
