@@ -166,24 +166,11 @@ void coalescent_logic(int const & seed, vector<tuple<int,int,double,int>> & phyl
 
 // organize how coalescent is run (to avoid recursion)
 int coalescent(int const & seed, vector<tuple<int,int,double,int>> & phylo) {
-    // prepare for iterative post-order traversal
-    /*
-    if(coalescent_root.empty()) {
-        coalescent_root = vector<int>(num2name.size(), -1);
-    }
-
-    // run the coalescent logic on each individual in post-order
-    for(int const & curr : postorder(seed)) {
-        coalescent_logic(curr, phylo);
-    }
-    */
     if(coalescent_root.empty()) {
         coalescent_root = vector<int>(num2name.size(), -1);
         for(int curr = num2name.size()-1; curr >= 0; --curr) {
             coalescent_logic(curr, phylo);
         }
     }
-
-    // finished running coalescent on all subtrees, so return the overall root
     return coalescent_root[seed];
 }
