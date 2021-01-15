@@ -4,7 +4,7 @@ CXXFLAGS?=-Wall -pedantic -std=c++11
 
 # flag specifications for release and debug
 RELEASEFLAGS?=$(CXXFLAGS) -O3
-DEBUGFLAGS?=$(CXXFLAGS) -O0 -g -pg
+DEBUGFLAGS?=$(CXXFLAGS) -O0 -g #-pg
 
 # relevant constants
 CPP_FILES=main.cpp common.cpp coalescent.cpp
