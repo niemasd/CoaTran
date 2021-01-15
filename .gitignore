@@ -12,6 +12,9 @@ coatran_transtree_debug
 *.nwk
 *.tre
 
+# Debug Files
+gmon.out
+
 # Prerequisites
 *.d
 

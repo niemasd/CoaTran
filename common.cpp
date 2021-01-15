@@ -98,10 +98,13 @@ void parse_transmissions(char* const & fn, vector<string> & num2name, unordered_
         int v; getline(is, tmp, '\t');
         if(tmp == "None") {
             cerr << "\"None\" cannot get infected" << endl; exit(1);
-        } else if(name2num.find(tmp) == name2num.end()) {
-            v = num2name.size(); num2name.push_back(tmp); name2num[tmp] = v; infected.push_back({});
         } else {
-            cout << "Reinfection event: " << tmp << endl; exit(1);
+            auto itr = name2num.find(tmp);
+            if(itr == name2num.end()) {
+                v = num2name.size(); num2name.push_back(tmp); name2num[tmp] = v; infected.push_back({});
+            } else if(u != itr->second) { // ignore recovery events
+                cout << "Reinfection event: " << tmp << endl; exit(1);
+            }
         }
 
         // parse t
