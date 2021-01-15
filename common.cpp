@@ -51,7 +51,6 @@ double sample_coal_time_expgrowth(double const & tau, int const & N, double cons
 
     // otherwise, sample from exponential population growth distribution
     const double & P = UNIFORM_0_1(RNG);
-    cout << ((log((-2.*r*S0*log(1.-P))/(N*(N-1)))+1.)/r)+tau-tauI << endl;
     return ((log((-2.*r*S0*log(1.-P))/(N*(N-1)))+1.)/r)+tau-tauI;
 }
 
@@ -102,8 +101,10 @@ void parse_transmissions(char* const & fn) {
             auto itr = name2num.find(tmp);
             if(itr == name2num.end()) {
                 v = num2name.size(); num2name.push_back(tmp); name2num[tmp] = v; infected.push_back({});
-            } else if(u != itr->second) { // ignore recovery events
-                cout << "Reinfection event: " << tmp << endl; exit(1);
+            } else if(u == itr->second) { // ignore recovery events
+                continue;
+            } else {
+                cerr << "Reinfection event: " << tmp << endl; exit(1);
             }
         }
 

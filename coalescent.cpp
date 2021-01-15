@@ -5,8 +5,38 @@
 #include <tuple>
 #include "coalescent.h"
 #include "common.h"
+#include <unordered_set> // TODO REMOVE
 
-int coalescent(int const & seed, vector<tuple<int,int,double,int>> & phylo) {
+// global variables related to just implementing coalescent
+vector<int> coalescent_root;
+
+// helper iterative post-order traversal
+vector<int> postorder(int const & seed) {
+    // prep for iterative post-order traversal
+    unsigned int const & MAX_DEPTH = 2*num2name.size(); // max possible depth
+    vector<int> s1; s1.reserve(MAX_DEPTH);              // first stack of iterative post-order
+    vector<int> s2; s2.reserve(MAX_DEPTH);              // second stack of iterative post-order
+    vector<int> out; out.reserve(MAX_DEPTH);            // output ordering of individuals
+    unordered_set<int> visited;
+
+    // perform iterative post-order traversal and return output
+    s1.push_back(seed);
+    visited.insert(seed);
+    while(!s1.empty()) {
+        int const & curr = s1.back(); s1.pop_back(); s2.push_back(curr);
+        for(int const & child : infected[curr]) {
+            s1.push_back(child);
+            visited.insert(child);
+        }
+    }
+    while(!s2.empty()) {
+        out.push_back(s2.back()); s2.pop_back();
+    }
+    return out;
+}
+
+// run the actual logic of the coalescent
+void coalescent_logic(int const & seed, vector<tuple<int,int,double,int>> & phylo) {
     // store things that are used multiple times
     double const & SEED_INF_TIME = infection_time[seed];
 
@@ -16,17 +46,23 @@ int coalescent(int const & seed, vector<tuple<int,int,double,int>> & phylo) {
         leaves.push_back(phylo.size()); phylo.push_back(make_tuple(-1,-1,t,seed));
     }
 
-    // first call this function recursively on children
+    // first check that this has already been called on children
     for(int const & child : infected[seed]) {
-        const int & tmp = coalescent(child, phylo);
-        if(tmp != -1) {
-            leaves.push_back(tmp);
+        if(coalescent_root[child] == -1) {
+            if(!sample_times[child].empty()) {
+                cerr << "Coalescent not run in post-order" << endl;
+                cerr << "parent: " << seed << " (" << num2name[seed] << ")" << endl;
+                cerr << "child: " << child << " (" << num2name[child] << ")" << endl;
+                exit(1);
+            }
+        } else {
+            leaves.push_back(coalescent_root[child]);
         }
     }
 
     // if no leaves, nothing to do
     if(leaves.empty()) {
-        return -1;
+        return;
     }
 
     // sort leaves in decreasing order of time
@@ -125,5 +161,29 @@ int coalescent(int const & seed, vector<tuple<int,int,double,int>> & phylo) {
     const int & parent = phylo.size();
     const int & child = lineages[0];
     phylo.push_back(make_tuple(child,child,SEED_INF_TIME,-1));
-    return parent;
+    coalescent_root[seed] = parent;
+}
+
+// organize how coalescent is run (to avoid recursion)
+int coalescent(int const & seed, vector<tuple<int,int,double,int>> & phylo) {
+    // prepare for iterative post-order traversal
+    /*
+    if(coalescent_root.empty()) {
+        coalescent_root = vector<int>(num2name.size(), -1);
+    }
+
+    // run the coalescent logic on each individual in post-order
+    for(int const & curr : postorder(seed)) {
+        coalescent_logic(curr, phylo);
+    }
+    */
+    if(coalescent_root.empty()) {
+        coalescent_root = vector<int>(num2name.size(), -1);
+        for(int curr = num2name.size()-1; curr >= 0; --curr) {
+            coalescent_logic(curr, phylo);
+        }
+    }
+
+    // finished running coalescent on all subtrees, so return the overall root
+    return coalescent_root[seed];
 }
