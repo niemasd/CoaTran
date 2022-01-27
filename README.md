@@ -80,4 +80,6 @@ coatran_inftime <trans_network> <sample_times>
 ```
 
 # Citing CoaTran
-TODO CITATION INFO
+If you use CoaTran in your work, please cite:
+
+> Moshiri N (2020). "CoaTran: Coalescent tree simulation along a transmission network." *bioRxiv*. [doi:10.1101/2020.11.10.377499](https://doi.org/10.1101/2020.11.10.377499)
