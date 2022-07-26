@@ -7,7 +7,7 @@ using namespace std;
 
 // CoaTran version
 #ifndef COATRAN_VERSION
-#define COATRAN_VERSION "0.0.1"
+#define COATRAN_VERSION "0.0.2"
 #endif
 
 // RNG seed environment variable
@@ -124,20 +124,18 @@ int main(int argc, char** argv) {
     sample_times = vector<vector<double>>(NUM_PEOPLE, vector<double>());
     parse_sample_times(argv[2]);
 
-    // sample coalescent phylogenies; phylos[i] is a vector of <left,right,time,person> nodes for seed i
-    vector<vector<tuple<int,int,double,int>>> phylos(NUM_SEEDS, vector<tuple<int,int,double,int>>());
-    vector<int> roots(NUM_SEEDS, -1); // roots[i] is the root index of phylos[i]
+    // sample coalescent phylogenies; phylo is a vector of <left,right,time,person> nodes
+    vector<tuple<int,int,double,int>> phylo;
+    vector<int> roots(NUM_SEEDS, -1); // roots[i] is the root index of phylo[i]
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
-        roots[i] = coalescent(seeds[i], phylos[i]);
+        roots[i] = coalescent(seeds[i], phylo);
     }
 
     // output Newick strings for each phylogeny
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
-        int const & root = roots[i]; vector<tuple<int,int,double,int>> const & phylo = phylos[i];
-        if(!phylo.empty()) {
-            string s; newick(root, phylo, s); s += ':'; s += to_string(get<2>(phylo[root])); s += ';';
-            cout << s << endl;
-        }
+        int const & root = roots[i];
+        string s; newick(root, phylo, s); s += ':'; s += to_string(get<2>(phylo[root])); s += ';';
+        cout << s << endl;
     }
     return 0;
 }
