@@ -7,7 +7,7 @@ using namespace std;
 
 // CoaTran version
 #ifndef COATRAN_VERSION
-#define COATRAN_VERSION "0.0.2"
+#define COATRAN_VERSION "0.0.3"
 #endif
 
 // RNG seed environment variable
@@ -134,8 +134,10 @@ int main(int argc, char** argv) {
     // output Newick strings for each phylogeny
     for(unsigned int i = 0; i < NUM_SEEDS; ++i) {
         int const & root = roots[i];
-        string s; newick(root, phylo, s); s += ':'; s += to_string(get<2>(phylo[root])); s += ';';
-        cout << s << endl;
+        if(root != -1) {
+            string s; newick(root, phylo, s); s += ':'; s += to_string(get<2>(phylo[root])); s += ';';
+            cout << s << endl;
+        }
     }
     return 0;
 }
