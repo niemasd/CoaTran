@@ -52,7 +52,7 @@ bool file_exists(char* const & fn);
  * @param rate The rate parameter (lambda) of the exponential distribution
  * @return A random sample from the user-defined exponential distribution
  */
-double sample_expon(double const & rate);
+double sample_expon(double const rate);
 
 /**
  * Sample from a truncated exponential distribution
@@ -60,7 +60,7 @@ double sample_expon(double const & rate);
  * @param T The point at which to truncate the exponential distribution, i.e., the maximum sample value
  * @return A random sample from the user-defined truncated exponential distribution
  */
-double sample_trunc_expon(double const & rate, double const & T);
+double sample_trunc_expon(double const rate, double const T);
 
 /**
  * Sample from the probability distribution of coalescent time with exponential population growth
@@ -71,7 +71,7 @@ double sample_trunc_expon(double const & rate, double const & T);
  * @param r Growth rate
  * @return A random sample of a coalescent time under exponential effective population growth
  */
-double sample_coal_time_expgrowth(double const & tau, int const & N, double const & tauI, double const & S0, double const & r);
+double sample_coal_time_expgrowth(double const tau, int const N, double const tauI, double const S0, double const r);
 
 /**
  * Sample from the probability distribution of truncated coalescent time with exponential population growth
@@ -83,7 +83,7 @@ double sample_coal_time_expgrowth(double const & tau, int const & N, double cons
  * @param r Growth rate
  * @return A random sample of a truncated coalescent time under exponential effective population growth
  */
-double sample_coal_time_expgrowth_trunc(double const & tau, int const & N, double const & tauI, double const & S0, double const & r);
+double sample_coal_time_expgrowth_trunc(double const tau, int const N, double const tauI, double const S0, double const r);
 
 /**
  * Load the transmission network from file
@@ -104,7 +104,7 @@ void parse_sample_times(char* const & fn);
  * @param s The string to build
  * @return A Newick string of the tree represented by phylo
  */
-void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, string & s);
+void newick(int const root, vector<tuple<int,int,double,int>> const & phylo, string & s);
 
 /**
  * Pop a random element from an unsorted vector
@@ -113,9 +113,9 @@ void newick(int const & root, vector<tuple<int,int,double,int>> const & phylo, s
  */
 template<class T>
 T vector_pop(vector<T> & vec) {
-    const int & last_ind = vec.size() - 1;
+    const int last_ind = vec.size() - 1;
     uniform_int_distribution<int> uniform_rv(0, last_ind);
-    const int & ind_to_remove = uniform_rv(RNG);
+    const int ind_to_remove = uniform_rv(RNG);
     T tmp = vec[ind_to_remove];
     vec[ind_to_remove] = vec[last_ind];
     vec.pop_back();

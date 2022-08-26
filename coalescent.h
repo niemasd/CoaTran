@@ -21,5 +21,5 @@ extern double eff_pop_size;      // Effective population size
  * @param phylo The (initially empty) vector to fill with the Newick tree as <left,right,time,person> tuples
  * @return The node (as an index of phylo) corresponding to the root of the (sub)tree
  */
-int coalescent(int const & seed, vector<tuple<int,int,double,int>> & phylo);
+int coalescent(int const seed, vector<tuple<int,int,double,int>> & phylo);
 #endif
