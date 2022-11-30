@@ -5,22 +5,13 @@ CoaTran is a tool that, given a transmission network and sample times, will simu
 To compile CoaTran, simply download the latest release or clone this repository, and then compile using `make`:
 
 ```bash
-$ make
-g++ -Wall -pedantic -std=c++11 -O3 -o coatran_constant main.cpp common.cpp common.h coalescent.cpp coalescent.h
-g++ -Wall -pedantic -std=c++11 -O3 -DEXPGROWTH -o coatran_expgrowth main.cpp common.cpp common.h coalescent.cpp coalescent.h
-g++ -Wall -pedantic -std=c++11 -O3 -DTRANSTREE -o coatran_transtree main.cpp common.cpp common.h coalescent.cpp coalescent.h
-g++ -Wall -pedantic -std=c++11 -O3 -DINFTIME -o coatran_inftime main.cpp common.cpp common.h coalescent.cpp coalescent.h
+git clone https://github.com/niemasd/CoaTran.git
+cd CoaTran
+make
+sudo mv coatran_* /usr/local/bin/ # optional step to install globally
 ```
 
-If you want to debug/benchmark, you can compile the debug executables using `make debug`:
-
-```bash
-$ make debug
-g++ -Wall -pedantic -std=c++11 -O0 -g -pg -o coatran_constant_debug main.cpp common.cpp common.h coalescent.cpp coalescent.h
-g++ -Wall -pedantic -std=c++11 -O0 -g -pg -DEXPGROWTH -o coatran_expgrowth_debug main.cpp common.cpp common.h coalescent.cpp coalescent.h
-g++ -Wall -pedantic -std=c++11 -O0 -g -pg -DTRANSTREE -o coatran_transtree_debug main.cpp common.cpp common.h coalescent.cpp coalescent.h
-g++ -Wall -pedantic -std=c++11 -O0 -g -pg -DINFTIME -o coatran_inftime_debug main.cpp common.cpp common.h coalescent.cpp coalescent.h
-```
+If you want to debug/benchmark, you can compile the debug executables using `make debug`.
 
 # Usage
 When compiled, CoaTran will produce different executables depending on the model of effective population size you choose to use. All modes have at least the following two parameters:
